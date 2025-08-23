@@ -1,0 +1,206 @@
+BIA (Bio-energy Intelligence Application)
+
+## 0) Scope
+
+* Build a **Streamlit-based Python demo app** (no Flask, no DB).
+* Features:
+
+  * **Signup & login** (bcrypt-hashed, in-memory via cache).
+  * **Waste logging per user** (date auto-recorded).
+  * **Entity dashboard**: profile, waste logs, energy/finance, forecast, CO₂ savings.
+  * **Facility maps** from curated CSV.
+  * **Audit tab** with formulas, assumptions, and provenance.
+* Supported cities:
+  `["Ahmedabad","Gandhinagar","Indore","Delhi","Mumbai","Pune","Bengaluru","Chennai"]`
+
+---
+
+## 1) Deliverable (File Structure)
+
+```
+bia_app/
+  app.py
+  requirements.txt
+  README.md
+  auth_inmemory.py
+  bia_core/
+    __init__.py
+    data_io.py
+    schemas.py
+    features.py
+    models.py
+    finance.py
+    eval.py
+    maps.py
+    utils.py
+  data/
+    curated/
+      city_stats.csv
+      facilities.csv
+      tariffs.csv
+      costs.csv
+```
+
+---
+
+## 2) Requirements (`requirements.txt`)
+
+```
+streamlit==1.36.0
+pandas
+numpy
+plotly
+statsmodels
+pydantic
+scikit-learn
+folium
+streamlit-folium
+pydeck
+python-dateutil
+bcrypt
+pyyaml
+matplotlib
+```
+
+---
+
+## 3) Authentication & Signup (in-memory)
+
+* **`auth_inmemory.py`**
+
+  * Thread-safe store using `st.cache_resource`.
+  * Users stored only during runtime (cleared on restart).
+  * Passwords hashed with bcrypt.
+  * Preloaded demo user: `demo / demo123`.
+  * Functions: `add_user`, `validate`, `add_log`, `logs_for`.
+
+* **Signup form fields**:
+
+  1. Username
+  2. Password
+  3. Entity name
+  4. City (from supported list)
+  5. Waste type (organic/industrial/agricultural)
+
+* **Login form**: username + password.
+
+* On success → user lands in dashboard.
+
+* Logout button clears session.
+
+---
+
+## 4) Waste Logging
+
+* Each user can log waste (tons) per session.
+* Auto-records `date=datetime.now().date()`.
+* Dashboard aggregates logs:
+
+  * Total waste so far.
+  * Today’s waste.
+  * Shows logs table.
+
+---
+
+## 5) Dashboard (Tabs)
+
+1. **Entity Profile**
+
+   * Show entity info + logs table.
+
+2. **Waste Trend & Forecast**
+
+   * Chart of waste logs over time.
+   * Deterministic + SARIMA forecasts.
+   * Backtest table with MAPE.
+
+3. **Energy & Finance**
+
+   * Gross electricity = sum logs × yield × cap factor.
+   * Estimated electricity = today’s waste × yield × cap factor.
+   * Annualized cashflows via `bia_core.finance`.
+   * CSV export of per-year data.
+
+4. **NPV & Sensitivity**
+
+   * NPV, Payback, ROI.
+   * Tornado chart (±15% param changes).
+
+5. **Facilities Map**
+
+   * Folium map from `facilities.csv`.
+   * Markers with details (name, type, capacity, status, source).
+   * If none → “No verified facilities in scope.”
+
+6. **Audit**
+
+   * LaTeX math formulas for all calculations.
+   * Parameter table (all inputs).
+   * Download run\_config.json.
+
+---
+
+## 6) Forecasting
+
+* **Deterministic baseline**:
+
+  ```
+  tpd_t = base_tpd * (1+g)^(t-1)
+  ```
+* **SARIMA**: `(1,1,1)x(0,1,1,12)` with fallback to deterministic.
+* **Model selection**: choose lower MAPE in backtest.
+
+---
+
+## 7) Finance & Climate (formulas)
+
+* Constants:
+
+  ```
+  INR_CRORE = 1e7
+  CO2_PER_KWH_KG = 0.9
+  ```
+* Per-year chain:
+
+  ```
+  tons_year_t = tpd_t * 365
+  kwh_year_t  = tons_year_t * yield * capacity_factor
+  revenue_t   = kwh_year_t * tariff
+  opex_t      = tons_year_t * opex + fixed_opex
+  ncf_t       = revenue_t - opex_t
+  ```
+* NPV = -CAPEX + Σ ncf\_t/(1+r)^t
+* Payback = min t where cumulative NCF ≥ CAPEX.
+* CO₂ savings = (kWh × 0.9)/1000 tons.
+* Trees = 50 × CO₂ tons.
+
+---
+
+## 8) UI/UX Rules
+
+* Sidebar: city selector, sliders for yield/tariff/opex/capex/discount/horizon, logout button.
+* Every numeric control shows units and ranges.
+* Warn if out of range.
+* Tabs separate major modules.
+
+---
+
+## 9) README.md
+
+* How to run:
+
+  ```bash
+  pip install -r requirements.txt
+  streamlit run app.py
+  ```
+* Demo login: `demo / demo123`.
+* Data provenance note.
+* Forecasting & finance formulas.
+* Limitations: only 8 cities, in-memory auth (no persistence).
+
+---
+
+👉 Build exactly as specified. Favor **simplicity, correctness, and explainability**.
+No extra folders like `tests/` or `samples/` are needed for this demo version.
+
+
