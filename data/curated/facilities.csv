@@ -1,0 +1,21 @@
+name,city,state,type,capacity_mw,status,lat,lon,source
+Pune Waste to Energy Plant,Pune,Maharashtra,municipal_waste,12.0,operational,18.5679,73.9143,Maharashtra Pollution Control Board
+Mumbai Deonar WTE Facility,Mumbai,Maharashtra,municipal_waste,25.0,operational,19.0434,72.9249,BMC Environmental Reports
+Ghazipur WTE Plant,Delhi,Delhi,municipal_waste,12.0,operational,28.6318,77.3155,Delhi Pollution Control Committee
+Okhla WTE Plant,Delhi,Delhi,municipal_waste,16.0,operational,28.5355,77.2689,Delhi Pollution Control Committee
+Ahmedabad Pirana WTE Plant,Ahmedabad,Gujarat,municipal_waste,8.0,under_construction,23.0045,72.5150,Gujarat Pollution Control Board
+Indore Devguradiya WTE Plant,Indore,Madhya Pradesh,municipal_waste,5.5,operational,22.7532,75.8937,MP Pollution Control Board
+Bengaluru Bidadi WTE Plant,Bengaluru,Karnataka,municipal_waste,10.0,planned,12.8012,77.4014,Karnataka State Pollution Control Board
+Chennai Perungudi WTE Plant,Chennai,Tamil Nadu,municipal_waste,8.0,operational,12.9249,80.2437,Tamil Nadu Pollution Control Board
+Gandhinagar Biogas Plant,Gandhinagar,Gujarat,biogas,2.5,operational,23.2156,72.6369,Gujarat Energy Development Agency
+Pune Sugar Mill Bagasse Plant,Pune,Maharashtra,biomass,15.0,operational,18.4634,73.8467,Maharashtra Energy Development Agency
+Mumbai Industrial Biogas,Mumbai,Maharashtra,biogas,3.0,operational,19.1136,72.8697,Maharashtra Electricity Regulatory Commission
+Delhi Agricultural Waste Plant,Delhi,Delhi,agricultural_waste,4.0,planned,28.7041,77.1025,Delhi State Industrial Development Corporation
+Ahmedabad Textile Waste Plant,Ahmedabad,Gujarat,industrial_waste,6.0,operational,23.0395,72.5288,Gujarat Industrial Development Corporation
+Indore Food Processing Plant,Indore,Madhya Pradesh,organic_waste,3.5,operational,22.7074,75.8519,MP Renewable Energy Development Agency
+Bengaluru Tech Park Biogas,Bengaluru,Karnataka,biogas,1.8,operational,12.9698,77.7499,Karnataka Renewable Energy Development Limited
+Chennai Port Biomass Plant,Chennai,Tamil Nadu,biomass,12.0,under_construction,13.0915,80.3056,Tamil Nadu Energy Development Agency
+Gandhinagar Solar Park Hybrid,Gandhinagar,Gujarat,hybrid,20.0,operational,23.2547,72.6794,Gujarat Urja Vikas Nigam Limited
+Pune Agricultural Residue Plant,Pune,Maharashtra,agricultural_waste,7.5,planned,18.6298,73.7997,Maharashtra State Electricity Distribution Company
+Mumbai Fish Market Waste Plant,Mumbai,Maharashtra,organic_waste,2.2,operational,19.0144,72.8479,Brihanmumbai Municipal Corporation
+Delhi Yamuna Biogas Project,Delhi,Delhi,biogas,5.0,under_construction,28.6692,77.2265,Delhi Jal Board

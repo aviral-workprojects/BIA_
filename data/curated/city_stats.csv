@@ -1,0 +1,9 @@
+city,population,waste_generation_tpd,organic_fraction,industrial_fraction,agricultural_fraction
+Ahmedabad,8500000,4500,0.60,0.30,0.10
+Gandhinagar,350000,200,0.65,0.25,0.10
+Indore,3300000,1800,0.70,0.20,0.10
+Delhi,32900000,11000,0.55,0.35,0.10
+Mumbai,20400000,9500,0.50,0.40,0.10
+Pune,6600000,2800,0.65,0.25,0.10
+Bengaluru,13200000,5000,0.60,0.30,0.10
+Chennai,11700000,4800,0.55,0.35,0.10

@@ -1,0 +1,8 @@
+technology,capex_per_mw,opex_per_mwh,capacity_factor,lifetime_years
+municipal_waste,45000000,850,0.85,20
+biogas,35000000,620,0.90,15
+biomass,38000000,780,0.80,20
+agricultural_waste,32000000,690,0.75,18
+industrial_waste,42000000,920,0.82,20
+organic_waste,28000000,580,0.88,15
+hybrid,55000000,750,0.85,25

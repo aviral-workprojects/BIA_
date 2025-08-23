@@ -1,0 +1,9 @@
+city,state,tariff_residential,tariff_commercial,tariff_industrial,renewable_tariff
+Ahmedabad,Gujarat,3.85,6.20,5.45,4.63
+Gandhinagar,Gujarat,3.90,6.25,5.50,4.65
+Indore,Madhya Pradesh,4.12,6.80,5.85,4.95
+Delhi,Delhi,4.50,8.50,6.50,5.25
+Mumbai,Maharashtra,4.20,9.20,7.80,4.85
+Pune,Maharashtra,4.15,8.90,7.60,4.80
+Bengaluru,Karnataka,3.95,7.40,6.20,4.75
+Chennai,Tamil Nadu,3.75,7.80,5.95,4.55
