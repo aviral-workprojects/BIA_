@@ -23,6 +23,123 @@ from bia_core.utils import format_currency, format_number, validate_range
 
 warnings.filterwarnings('ignore')
 
+# Language translations
+TRANSLATIONS = {
+    "en": {
+        "app_title": "BIA - Bio-energy Intelligence Application",
+        "welcome_message": "Welcome to the Bio-energy Intelligence Platform",
+        "login": "Login",
+        "signup": "Sign Up",
+        "username": "Username",
+        "password": "Password",
+        "entity_name": "Entity Name",
+        "city": "City",
+        "waste_type": "Waste Type",
+        "login_success": "Login successful!",
+        "invalid_credentials": "Invalid username or password",
+        "enter_credentials": "Please enter both username and password",
+        "demo_user": "Demo user: **demo** / **demo123**",
+        "account_created": "Account created successfully! Please login.",
+        "username_exists": "Username already exists",
+        "fill_fields": "Please fill in all fields",
+        "bia_controls": "BIA Controls",
+        "user": "User",
+        "entity": "Entity",
+        "technical_params": "Technical Parameters",
+        "yield_rate": "Yield Rate (kWh/ton)",
+        "capacity_factor": "Capacity Factor (%)",
+        "financial_params": "Financial Parameters",
+        "tariff": "Tariff (₹/kWh)",
+        "opex_per_ton": "OPEX per ton (₹)",
+        "fixed_opex": "Fixed OPEX (₹ lakhs/year)",
+        "capex": "CAPEX (₹ crores)",
+        "discount_rate": "Discount Rate (%)",
+        "project_horizon": "Project Horizon (years)",
+        "advanced_options": "Advanced Options",
+        "logout": "Logout",
+        "language": "Language",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "log_waste": "➕ Log Waste",
+        "waste_amount": "Waste Amount (tons)",
+        "date": "Date",
+        "add_waste_log": "Add Waste Log",
+        "waste_processed": "Waste Processed",
+        "energy_generated": "Energy Generated",
+        "co2_saved": "CO₂ Saved",
+        "dashboard": "Dashboard",
+        "entity_profile": "Entity Profile",
+        "waste_trend_forecast": "Waste Trend & Forecast",
+        "energy_finance": "Energy & Finance",
+        "npv_sensitivity": "NPV & Sensitivity",
+        "facilities_map": "Facilities Map",
+        "audit": "Audit",
+        "tons": "tons",
+        "kwh": "kWh",
+        "years": "years"
+    },
+    "hi": {
+        "app_title": "BIA - जैव-ऊर्जा बुद्धिमत्ता अनुप्रयोग",
+        "welcome_message": "जैव-ऊर्जा बुद्धिमत्ता मंच में आपका स्वागत है",
+        "login": "लॉगिन",
+        "signup": "साइन अप",
+        "username": "उपयोगकर्ता नाम",
+        "password": "पासवर्ड",
+        "entity_name": "संस्था का नाम",
+        "city": "शहर",
+        "waste_type": "अपशिष्ट प्रकार",
+        "login_success": "लॉगिन सफल!",
+        "invalid_credentials": "अमान्य उपयोगकर्ता नाम या पासवर्ड",
+        "enter_credentials": "कृपया उपयोगकर्ता नाम और पासवर्ड दर्ज करें",
+        "demo_user": "डेमो उपयोगकर्ता: **demo** / **demo123**",
+        "account_created": "खाता सफलतापूर्वक बनाया गया! कृपया लॉगिन करें।",
+        "username_exists": "उपयोगकर्ता नाम पहले से मौजूद है",
+        "fill_fields": "कृपया सभी फ़ील्ड भरें",
+        "bia_controls": "BIA नियंत्रण",
+        "user": "उपयोगकर्ता",
+        "entity": "संस्था",
+        "technical_params": "तकनीकी मापदंड",
+        "yield_rate": "उत्पादन दर (kWh/टन)",
+        "capacity_factor": "क्षमता कारक (%)",
+        "financial_params": "वित्तीय मापदंड",
+        "tariff": "टैरिफ (₹/kWh)",
+        "opex_per_ton": "OPEX प्रति टन (₹)",
+        "fixed_opex": "निश्चित OPEX (₹ लाख/वर्ष)",
+        "capex": "CAPEX (₹ करोड़)",
+        "discount_rate": "छूट दर (%)",
+        "project_horizon": "परियोजना अवधि (वर्ष)",
+        "advanced_options": "उन्नत विकल्प",
+        "logout": "लॉगआउट",
+        "language": "भाषा",
+        "theme": "थीम",
+        "light": "हल्का",
+        "dark": "गहरा",
+        "log_waste": "➕ अपशिष्ट लॉग करें",
+        "waste_amount": "अपशिष्ट मात्रा (टन)",
+        "date": "दिनांक",
+        "add_waste_log": "अपशिष्ट लॉग जोड़ें",
+        "waste_processed": "प्रसंस्कृत अपशिष्ट",
+        "energy_generated": "उत्पन्न ऊर्जा",
+        "co2_saved": "CO₂ बचत",
+        "dashboard": "डैशबोर्ड",
+        "entity_profile": "संस्था प्रोफ़ाइल",
+        "waste_trend_forecast": "अपशिष्ट प्रवृत्ति और पूर्वानुमान",
+        "energy_finance": "ऊर्जा और वित्त",
+        "npv_sensitivity": "NPV और संवेदनशीलता",
+        "facilities_map": "सुविधाएं मानचित्र",
+        "audit": "ऑडिट",
+        "tons": "टन",
+        "kwh": "kWh",
+        "years": "वर्ष"
+    }
+}
+
+def t(key):
+    """Translation function"""
+    language = st.session_state.get('language', 'en')
+    return TRANSLATIONS.get(language, {}).get(key, key)
+
 # Page configuration
 st.set_page_config(
     page_title="BIA - Bio-energy Intelligence Application",
@@ -46,20 +163,24 @@ def init_session_state():
         st.session_state.username = None
     if 'user_profile' not in st.session_state:
         st.session_state.user_profile = None
+    if 'language' not in st.session_state:
+        st.session_state.language = 'en'
+    if 'theme' not in st.session_state:
+        st.session_state.theme = 'light'
 
 def login_signup_page():
     """Handle login and signup"""
-    st.title("🔋 BIA - Bio-energy Intelligence Application")
-    st.markdown("### Welcome to the Bio-energy Intelligence Platform")
+    st.title(f"🔋 {t('app_title')}")
+    st.markdown(f"### {t('welcome_message')}")
     
-    tab1, tab2 = st.tabs(["Login", "Sign Up"])
+    tab1, tab2 = st.tabs([t("login"), t("signup")])
     
     with tab1:
-        st.subheader("Login")
+        st.subheader(t("login"))
         with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            login_btn = st.form_submit_button("Login")
+            username = st.text_input(t("username"))
+            password = st.text_input(t("password"), type="password")
+            login_btn = st.form_submit_button(t("login"))
             
             if login_btn:
                 if username and password:
@@ -68,104 +189,141 @@ def login_signup_page():
                         st.session_state.logged_in = True
                         st.session_state.username = username
                         st.session_state.user_profile = user_profile
-                        st.success("Login successful!")
+                        st.success(t("login_success"))
                         st.rerun()
                     else:
-                        st.error("Invalid username or password")
+                        st.error(t("invalid_credentials"))
                 else:
-                    st.error("Please enter both username and password")
+                    st.error(t("enter_credentials"))
         
-        st.info("Demo user: **demo** / **demo123**")
+        st.info(t("demo_user"))
     
     with tab2:
-        st.subheader("Sign Up")
+        st.subheader(t("signup"))
         with st.form("signup_form"):
-            new_username = st.text_input("Username", key="signup_username")
-            new_password = st.text_input("Password", type="password", key="signup_password")
-            entity_name = st.text_input("Entity Name")
-            city = st.selectbox("City", SUPPORTED_CITIES)
-            waste_type = st.selectbox("Waste Type", WASTE_TYPES)
-            signup_btn = st.form_submit_button("Sign Up")
+            new_username = st.text_input(t("username"), key="signup_username")
+            new_password = st.text_input(t("password"), type="password", key="signup_password")
+            entity_name = st.text_input(t("entity_name"))
+            city = st.selectbox(t("city"), SUPPORTED_CITIES)
+            waste_type = st.selectbox(t("waste_type"), WASTE_TYPES)
+            signup_btn = st.form_submit_button(t("signup"))
             
             if signup_btn:
                 if all([new_username, new_password, entity_name, city, waste_type]):
                     if add_user(new_username, new_password, entity_name, city, waste_type):
-                        st.success("Account created successfully! Please login.")
+                        st.success(t("account_created"))
                     else:
-                        st.error("Username already exists")
+                        st.error(t("username_exists"))
                 else:
-                    st.error("Please fill in all fields")
+                    st.error(t("fill_fields"))
 
 def sidebar_controls():
     """Create sidebar controls for parameters"""
-    st.sidebar.title("🔋 BIA Controls")
+    st.sidebar.title(f"🔋 {t('bia_controls')}")
+    
+    # Language and theme selector
+    col1, col2 = st.sidebar.columns(2)
+    with col1:
+        language = st.selectbox(
+            t("language"),
+            options=["en", "hi"],
+            format_func=lambda x: "English" if x == "en" else "हिन्दी",
+            index=0 if st.session_state.language == "en" else 1,
+            key="language_selector"
+        )
+        if language != st.session_state.language:
+            st.session_state.language = language
+            st.rerun()
+    
+    with col2:
+        theme = st.selectbox(
+            t("theme"),
+            options=["light", "dark"],
+            format_func=lambda x: t("light") if x == "light" else t("dark"),
+            index=0 if st.session_state.theme == "light" else 1,
+            key="theme_selector"
+        )
+        if theme != st.session_state.theme:
+            st.session_state.theme = theme
+            st.rerun()
+    
+    # Apply theme styling
+    if st.session_state.theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp { background-color: #0E1117; }
+        .stSidebar { background-color: #262730; }
+        </style>
+        """, unsafe_allow_html=True)
     
     # User info
     if st.session_state.user_profile:
-        st.sidebar.write(f"**User:** {st.session_state.username}")
-        st.sidebar.write(f"**Entity:** {st.session_state.user_profile.entity_name}")
-        st.sidebar.write(f"**City:** {st.session_state.user_profile.city}")
-        st.sidebar.write(f"**Waste Type:** {st.session_state.user_profile.waste_type}")
+        st.sidebar.write(f"**{t('user')}:** {st.session_state.username}")
+        st.sidebar.write(f"**{t('entity')}:** {st.session_state.user_profile.entity_name}")
+        st.sidebar.write(f"**{t('city')}:** {st.session_state.user_profile.city}")
+        st.sidebar.write(f"**{t('waste_type')}:** {st.session_state.user_profile.waste_type}")
     
     st.sidebar.divider()
     
-    # Parameter controls
-    st.sidebar.subheader("Technical Parameters")
+    # Basic parameters
+    st.sidebar.subheader(t("technical_params"))
     
     yield_rate = st.sidebar.slider(
-        "Yield Rate (kWh/ton)", 
+        t("yield_rate"), 
         min_value=100.0, max_value=2000.0, value=800.0, step=50.0,
         help="Energy yield per ton of waste"
     )
     
     capacity_factor = st.sidebar.slider(
-        "Capacity Factor (%)", 
+        t("capacity_factor"), 
         min_value=30.0, max_value=95.0, value=85.0, step=5.0,
         help="Plant capacity utilization factor"
     ) / 100
     
-    st.sidebar.subheader("Financial Parameters")
+    st.sidebar.subheader(t("financial_params"))
     
     tariff = st.sidebar.slider(
-        "Tariff (₹/kWh)", 
+        t("tariff"), 
         min_value=2.0, max_value=8.0, value=4.5, step=0.1,
         help="Electricity selling price"
     )
     
     opex_per_ton = st.sidebar.slider(
-        "OPEX per ton (₹)", 
+        t("opex_per_ton"), 
         min_value=200.0, max_value=1000.0, value=500.0, step=50.0,
         help="Operating expenses per ton of waste"
     )
     
-    fixed_opex = st.sidebar.number_input(
-        "Fixed OPEX (₹ lakhs/year)", 
-        min_value=0.0, max_value=100.0, value=10.0, step=1.0,
-        help="Fixed annual operating expenses"
-    ) * 100000  # Convert to rupees
-    
-    capex = st.sidebar.number_input(
-        "CAPEX (₹ crores)", 
-        min_value=1.0, max_value=100.0, value=25.0, step=1.0,
-        help="Capital expenditure"
-    ) * 10000000  # Convert to rupees
-    
-    discount_rate = st.sidebar.slider(
-        "Discount Rate (%)", 
-        min_value=5.0, max_value=20.0, value=12.0, step=0.5,
-        help="Cost of capital"
-    ) / 100
-    
-    horizon_years = st.sidebar.slider(
-        "Project Horizon (years)", 
-        min_value=10, max_value=30, value=20, step=1,
-        help="Project lifetime"
-    )
+    # Advanced options in expander
+    with st.sidebar.expander(t("advanced_options")):
+        fixed_opex = st.number_input(
+            t("fixed_opex"), 
+            min_value=0.0, max_value=100.0, value=10.0, step=1.0,
+            help="Fixed annual operating expenses"
+        ) * 100000  # Convert to rupees
+        
+        capex = st.number_input(
+            t("capex"), 
+            min_value=1.0, max_value=100.0, value=25.0, step=1.0,
+            help="Capital expenditure"
+        ) * 10000000  # Convert to rupees
+        
+        discount_rate = st.slider(
+            t("discount_rate"), 
+            min_value=5.0, max_value=20.0, value=12.0, step=0.5,
+            help="Cost of capital"
+        ) / 100
+        
+        horizon_years = st.slider(
+            t("project_horizon"), 
+            min_value=10, max_value=30, value=20, step=1,
+            help="Project lifetime"
+        )
     
     st.sidebar.divider()
     
     # Logout button
-    if st.sidebar.button("Logout", type="secondary"):
+    if st.sidebar.button(t("logout"), type="secondary"):
         st.session_state.logged_in = False
         st.session_state.username = None
         st.session_state.user_profile = None
@@ -184,19 +342,19 @@ def sidebar_controls():
 
 def waste_logging_section():
     """Waste logging interface"""
-    st.subheader("📝 Log Waste")
+    st.subheader(t("log_waste"))
     
     with st.form("waste_log_form"):
         col1, col2 = st.columns(2)
         with col1:
             waste_amount = st.number_input(
-                "Waste Amount (tons)", 
+                t("waste_amount"), 
                 min_value=0.01, max_value=1000.0, value=1.0, step=0.1
             )
         with col2:
-            log_date = st.date_input("Date", value=date.today())
+            log_date = st.date_input(t("date"), value=date.today())
         
-        submit_btn = st.form_submit_button("Add Waste Log")
+        submit_btn = st.form_submit_button(t("add_waste_log"))
         
         if submit_btn:
             if waste_amount > 0:
@@ -206,7 +364,7 @@ def waste_logging_section():
                     waste_tons=waste_amount
                 )
                 add_waste_log(waste_log)
-                st.success(f"Added {waste_amount} tons of waste for {log_date}")
+                st.success(f"Added {waste_amount} {t('tons')} of waste for {log_date}")
                 st.rerun()
             else:
                 st.error("Please enter a valid waste amount")
@@ -822,22 +980,122 @@ def audit_tab(params):
     - No detailed technical feasibility assessment
     """)
 
-def main_dashboard():
-    """Main dashboard with tabs"""
-    st.title("🔋 BIA Dashboard")
+def get_kpi_data(params):
+    """Calculate KPI data for dashboard"""
+    logs = get_user_logs(st.session_state.username)
+    
+    if not logs:
+        return {
+            'total_waste': 0,
+            'total_energy': 0,
+            'co2_saved': 0
+        }
+    
+    total_waste = sum(log.waste_tons for log in logs)
+    total_energy = total_waste * params['yield_rate'] * params['capacity_factor']
+    co2_saved = (total_energy * 0.9) / 1000  # kg to tons
+    
+    return {
+        'total_waste': total_waste,
+        'total_energy': total_energy,
+        'co2_saved': co2_saved
+    }
+
+def clean_dashboard_screen(params):
+    """Clean first screen with KPI cards and log waste action"""
+    st.title(f"🔋 {t('dashboard')}")
     st.markdown(f"**Welcome, {st.session_state.user_profile.entity_name}!**")
     
+    # Get KPI data
+    kpi_data = get_kpi_data(params)
+    
+    # KPI Cards
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(
+            label=t("waste_processed"),
+            value=f"{kpi_data['total_waste']:.1f} {t('tons')}",
+            delta=None,
+            help="Total waste processed so far"
+        )
+    
+    with col2:
+        st.metric(
+            label=t("energy_generated"),
+            value=f"{format_number(kpi_data['total_energy'])} {t('kwh')}",
+            delta=None,
+            help="Total energy generated from waste"
+        )
+    
+    with col3:
+        st.metric(
+            label=t("co2_saved"),
+            value=f"{kpi_data['co2_saved']:.1f} {t('tons')}",
+            delta=None,
+            help="CO₂ emissions saved"
+        )
+    
+    st.divider()
+    
+    # Quick waste logging
+    st.subheader(t("log_waste"))
+    
+    with st.form("quick_waste_log"):
+        col1, col2, col3 = st.columns([2, 2, 1])
+        
+        with col1:
+            waste_amount = st.number_input(
+                t("waste_amount"),
+                min_value=0.01,
+                max_value=1000.0,
+                value=1.0,
+                step=0.1
+            )
+        
+        with col2:
+            log_date = st.date_input(t("date"), value=date.today())
+        
+        with col3:
+            st.write("")  # Spacer
+            st.write("")  # Spacer
+            submit_btn = st.form_submit_button(
+                t("add_waste_log"),
+                type="primary",
+                use_container_width=True
+            )
+        
+        if submit_btn:
+            if waste_amount > 0:
+                waste_log = WasteLog(
+                    username=st.session_state.username,
+                    date=log_date,
+                    waste_tons=waste_amount
+                )
+                add_waste_log(waste_log)
+                st.success(f"Added {waste_amount} {t('tons')} of waste for {log_date}")
+                st.rerun()
+            else:
+                st.error("Please enter a valid waste amount")
+
+def main_dashboard():
+    """Main dashboard with tabs"""
     # Get parameters from sidebar
     params = sidebar_controls()
     
-    # Create tabs
+    # Show clean dashboard first
+    clean_dashboard_screen(params)
+    
+    st.divider()
+    
+    # Create tabs for detailed analysis
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🏢 Entity Profile",
-        "📈 Waste Trend & Forecast", 
-        "⚡ Energy & Finance",
-        "💹 NPV & Sensitivity",
-        "🗺️ Facilities Map",
-        "🔍 Audit"
+        f"🏢 {t('entity_profile')}",
+        f"📈 {t('waste_trend_forecast')}", 
+        f"⚡ {t('energy_finance')}",
+        f"💹 {t('npv_sensitivity')}",
+        f"🗺️ {t('facilities_map')}",
+        f"🔍 {t('audit')}"
     ])
     
     with tab1:
