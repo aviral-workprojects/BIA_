@@ -13,7 +13,8 @@ class FinanceCalculator:
     
     def __init__(self, yield_rate: float, capacity_factor: float, tariff: float,
                  opex_per_ton: float, fixed_opex: float, capex: float, 
-                 discount_rate: float):
+                 discount_rate: float, carbon_credit_price: float = 0.0, 
+                 byproduct_price: float = 0.0, enable_byproduct: bool = False):
         """
         Initialize finance calculator
         
@@ -25,6 +26,9 @@ class FinanceCalculator:
             fixed_opex: Fixed OPEX in ₹/year
             capex: Capital expenditure in ₹
             discount_rate: Discount rate (0-1)
+            carbon_credit_price: Price per carbon credit in ₹
+            byproduct_price: Price per ton of byproduct in ₹
+            enable_byproduct: Whether to include byproduct revenue
         """
         self.yield_rate = yield_rate
         self.capacity_factor = capacity_factor
@@ -33,6 +37,9 @@ class FinanceCalculator:
         self.fixed_opex = fixed_opex
         self.capex = capex
         self.discount_rate = discount_rate
+        self.carbon_credit_price = carbon_credit_price
+        self.byproduct_price = byproduct_price
+        self.enable_byproduct = enable_byproduct
     
     def calculate_annual_metrics(self, daily_waste_tons: float, year: int, 
                                growth_rate: float = 0.02) -> Dict[str, float]:
@@ -44,8 +51,21 @@ class FinanceCalculator:
         # Energy generation
         annual_kwh = annual_waste_tons * self.yield_rate * self.capacity_factor
         
-        # Revenue
-        annual_revenue = annual_kwh * self.tariff
+        # Revenue from electricity
+        electricity_revenue = annual_kwh * self.tariff
+        
+        # Carbon credits revenue (1 credit per ton CO2 saved)
+        co2_saved_tons = (annual_kwh * CO2_PER_KWH_KG) / 1000
+        carbon_revenue = co2_saved_tons * self.carbon_credit_price
+        
+        # Byproduct revenue (conservative: 0.3 tons byproduct per ton waste)
+        byproduct_revenue = 0.0
+        if self.enable_byproduct:
+            byproduct_tons = annual_waste_tons * 0.3  # Conservative ratio
+            byproduct_revenue = byproduct_tons * self.byproduct_price
+        
+        # Total revenue
+        annual_revenue = electricity_revenue + carbon_revenue + byproduct_revenue
         
         # Operating expenses
         variable_opex = annual_waste_tons * self.opex_per_ton
@@ -58,11 +78,15 @@ class FinanceCalculator:
             'year': year,
             'waste_tons': annual_waste_tons,
             'electricity_kwh': annual_kwh,
+            'electricity_revenue': electricity_revenue,
+            'carbon_revenue': carbon_revenue,
+            'byproduct_revenue': byproduct_revenue,
             'revenue': annual_revenue,
             'variable_opex': variable_opex,
             'fixed_opex': self.fixed_opex,
             'total_opex': total_opex,
-            'ncf': ncf
+            'ncf': ncf,
+            'co2_saved_tons': co2_saved_tons
         }
     
     def calculate_cashflows(self, daily_waste_tons: float, horizon_years: int,
@@ -212,7 +236,10 @@ class FinanceCalculator:
             'opex_per_ton': self.opex_per_ton,
             'fixed_opex': self.fixed_opex,
             'capex': self.capex,
-            'discount_rate': self.discount_rate
+            'discount_rate': self.discount_rate,
+            'carbon_credit_price': self.carbon_credit_price,
+            'byproduct_price': self.byproduct_price,
+            'enable_byproduct': self.enable_byproduct
         }
         
         if param_name in params:

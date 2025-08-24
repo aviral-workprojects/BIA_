@@ -77,7 +77,16 @@ TRANSLATIONS = {
         "audit": "Audit",
         "tons": "tons",
         "kwh": "kWh",
-        "years": "years"
+        "years": "years",
+        "optional_revenue": "Optional Revenue Streams",
+        "carbon_credits": "Carbon Credits (₹/credit)",
+        "carbon_credits_help": "Revenue from carbon credit sales (1 credit = 1 ton CO₂)",
+        "byproduct_sales": "Enable Byproduct Sales",
+        "byproduct_price": "Byproduct Price (₹/ton)",
+        "byproduct_help": "Revenue from digestate/compost sales",
+        "with_credits": "With Credits",
+        "without_credits": "Without Credits",
+        "byproduct_revenue": "Byproduct Revenue"
     },
     "hi": {
         "app_title": "BIA - जैव-ऊर्जा बुद्धिमत्ता अनुप्रयोग",
@@ -131,7 +140,16 @@ TRANSLATIONS = {
         "audit": "ऑडिट",
         "tons": "टन",
         "kwh": "kWh",
-        "years": "वर्ष"
+        "years": "वर्ष",
+        "optional_revenue": "वैकल्पिक राजस्व स्रोत",
+        "carbon_credits": "कार्बन क्रेडिट (₹/क्रेडिट)",
+        "carbon_credits_help": "कार्बन क्रेडिट बिक्री से राजस्व (1 क्रेडिट = 1 टन CO₂)",
+        "byproduct_sales": "उप-उत्पाद बिक्री सक्षम करें",
+        "byproduct_price": "उप-उत्पाद मूल्य (₹/टन)",
+        "byproduct_help": "डाइजेस्टेट/कंपोस्ट बिक्री से राजस्व",
+        "with_credits": "क्रेडिट के साथ",
+        "without_credits": "क्रेडिट के बिना",
+        "byproduct_revenue": "उप-उत्पाद राजस्व"
     }
 }
 
@@ -294,6 +312,29 @@ def sidebar_controls():
         help="Operating expenses per ton of waste"
     )
     
+    # Optional Revenue Streams
+    st.sidebar.subheader(f"{t('optional_revenue')} (Optional)")
+    
+    carbon_credit_price = st.sidebar.slider(
+        t("carbon_credits"),
+        min_value=0.0, max_value=1000.0, value=300.0, step=10.0,
+        help=t("carbon_credits_help")
+    )
+    
+    enable_byproduct = st.sidebar.checkbox(
+        t("byproduct_sales"),
+        value=False,
+        help=t("byproduct_help")
+    )
+    
+    byproduct_price = 0.0
+    if enable_byproduct:
+        byproduct_price = st.sidebar.slider(
+            t("byproduct_price"),
+            min_value=0.0, max_value=500.0, value=50.0, step=5.0,
+            help=t("byproduct_help")
+        )
+    
     # Advanced options in expander
     with st.sidebar.expander(t("advanced_options")):
         fixed_opex = st.number_input(
@@ -337,7 +378,10 @@ def sidebar_controls():
         'fixed_opex': fixed_opex,
         'capex': capex,
         'discount_rate': discount_rate,
-        'horizon_years': horizon_years
+        'horizon_years': horizon_years,
+        'carbon_credit_price': carbon_credit_price,
+        'enable_byproduct': enable_byproduct,
+        'byproduct_price': byproduct_price
     }
 
 def waste_logging_section():
@@ -597,7 +641,10 @@ def energy_finance_tab(params):
         opex_per_ton=params['opex_per_ton'],
         fixed_opex=params['fixed_opex'],
         capex=params['capex'],
-        discount_rate=params['discount_rate']
+        discount_rate=params['discount_rate'],
+        carbon_credit_price=params['carbon_credit_price'],
+        byproduct_price=params['byproduct_price'],
+        enable_byproduct=params['enable_byproduct']
     )
     
     # Calculate average daily waste for projections
@@ -614,10 +661,26 @@ def energy_finance_tab(params):
     
     fig_cf = go.Figure()
     
+    # Split revenue into components for stacked bar chart
+    electricity_revenues = [cf['electricity_revenue'] for cf in cashflows]
+    carbon_revenues = [cf['carbon_revenue'] for cf in cashflows] 
+    byproduct_revenues = [cf['byproduct_revenue'] for cf in cashflows]
+    
     fig_cf.add_trace(go.Bar(
-        x=years, y=[cf['revenue'] for cf in cashflows],
-        name='Revenue', marker_color='green'
+        x=years, y=electricity_revenues,
+        name='Electricity Revenue', marker_color='green'
     ))
+    
+    fig_cf.add_trace(go.Bar(
+        x=years, y=carbon_revenues,
+        name='Carbon Credits', marker_color='lightgreen'
+    ))
+    
+    if params['enable_byproduct']:
+        fig_cf.add_trace(go.Bar(
+            x=years, y=byproduct_revenues,
+            name=t('byproduct_revenue'), marker_color='darkgreen'
+        ))
     
     fig_cf.add_trace(go.Bar(
         x=years, y=[-cf['opex'] for cf in cashflows],
@@ -634,7 +697,7 @@ def energy_finance_tab(params):
         title="Annual Cashflows",
         xaxis_title="Year",
         yaxis_title="Amount (₹)",
-        barmode='relative'
+        barmode='stack'
     )
     
     st.plotly_chart(fig_cf, use_container_width=True)
@@ -644,7 +707,10 @@ def energy_finance_tab(params):
         'Year': i+1,
         'Waste (tons)': cf['waste_tons'],
         'Electricity (kWh)': cf['electricity_kwh'],
-        'Revenue (₹)': cf['revenue'],
+        'Electricity Revenue (₹)': cf['electricity_revenue'],
+        'Carbon Credits Revenue (₹)': cf['carbon_revenue'],
+        'Byproduct Revenue (₹)': cf['byproduct_revenue'],
+        'Total Revenue (₹)': cf['revenue'],
         'OPEX (₹)': cf['opex'],
         'Net Cash Flow (₹)': cf['ncf']
     } for i, cf in enumerate(cashflows)])
@@ -683,7 +749,10 @@ def npv_sensitivity_tab(params):
         opex_per_ton=params['opex_per_ton'],
         fixed_opex=params['fixed_opex'],
         capex=params['capex'],
-        discount_rate=params['discount_rate']
+        discount_rate=params['discount_rate'],
+        carbon_credit_price=params['carbon_credit_price'],
+        byproduct_price=params['byproduct_price'],
+        enable_byproduct=params['enable_byproduct']
     )
     
     # Calculate base case metrics
@@ -748,7 +817,10 @@ def npv_sensitivity_tab(params):
             opex_per_ton=params_high['opex_per_ton'],
             fixed_opex=params_high['fixed_opex'],
             capex=params_high['capex'],
-            discount_rate=params_high['discount_rate']
+            discount_rate=params_high['discount_rate'],
+            carbon_credit_price=params_high.get('carbon_credit_price', params['carbon_credit_price']),
+            byproduct_price=params_high.get('byproduct_price', params['byproduct_price']),
+            enable_byproduct=params_high.get('enable_byproduct', params['enable_byproduct'])
         )
         
         npv_high = calc_high.calculate_npv(avg_daily_waste, params['horizon_years'])
@@ -764,7 +836,10 @@ def npv_sensitivity_tab(params):
             opex_per_ton=params_low['opex_per_ton'],
             fixed_opex=params_low['fixed_opex'],
             capex=params_low['capex'],
-            discount_rate=params_low['discount_rate']
+            discount_rate=params_low['discount_rate'],
+            carbon_credit_price=params_low.get('carbon_credit_price', params['carbon_credit_price']),
+            byproduct_price=params_low.get('byproduct_price', params['byproduct_price']),
+            enable_byproduct=params_low.get('enable_byproduct', params['enable_byproduct'])
         )
         
         npv_low = calc_low.calculate_npv(avg_daily_waste, params['horizon_years'])
@@ -807,6 +882,55 @@ def npv_sensitivity_tab(params):
     st.subheader("📋 Sensitivity Results")
     sens_df = pd.DataFrame(sensitivity_results)
     st.dataframe(sens_df, use_container_width=True)
+    
+    # Optional Revenue Impact Comparison
+    if params['carbon_credit_price'] > 0 or params['enable_byproduct']:
+        st.subheader("🌱 Revenue Stream Comparison")
+        
+        # Calculate base scenario (no carbon credits, no byproduct)
+        calc_base = FinanceCalculator(
+            yield_rate=params['yield_rate'],
+            capacity_factor=params['capacity_factor'],
+            tariff=params['tariff'],
+            opex_per_ton=params['opex_per_ton'],
+            fixed_opex=params['fixed_opex'],
+            capex=params['capex'],
+            discount_rate=params['discount_rate'],
+            carbon_credit_price=0.0,
+            byproduct_price=0.0,
+            enable_byproduct=False
+        )
+        
+        npv_base = calc_base.calculate_npv(avg_daily_waste, params['horizon_years'])
+        npv_with_extras = calc.calculate_npv(avg_daily_waste, params['horizon_years'])
+        npv_improvement = npv_with_extras - npv_base
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Base NPV (Electricity Only)", f"₹{format_currency(npv_base)}")
+        with col2:
+            st.metric("NPV with Extras", f"₹{format_currency(npv_with_extras)}")
+        with col3:
+            st.metric("Improvement", f"₹{format_currency(npv_improvement)}", 
+                     delta=f"{((npv_improvement/npv_base)*100):.1f}%" if npv_base != 0 else "N/A")
+        
+        # Show revenue breakdown
+        cashflows = calc.calculate_cashflows(avg_daily_waste, params['horizon_years'])
+        total_electricity_rev = sum(cf['electricity_revenue'] for cf in cashflows)
+        total_carbon_rev = sum(cf['carbon_revenue'] for cf in cashflows)
+        total_byproduct_rev = sum(cf['byproduct_revenue'] for cf in cashflows)
+        
+        st.write("**Revenue Breakdown over Project Life:**")
+        revenue_breakdown = pd.DataFrame({
+            'Revenue Stream': ['Electricity Sales', 'Carbon Credits', 'Byproduct Sales'],
+            'Total (₹)': [total_electricity_rev, total_carbon_rev, total_byproduct_rev],
+            'Percentage': [
+                f"{(total_electricity_rev/(total_electricity_rev + total_carbon_rev + total_byproduct_rev)*100):.1f}%",
+                f"{(total_carbon_rev/(total_electricity_rev + total_carbon_rev + total_byproduct_rev)*100):.1f}%",
+                f"{(total_byproduct_rev/(total_electricity_rev + total_carbon_rev + total_byproduct_rev)*100):.1f}%"
+            ]
+        })
+        st.dataframe(revenue_breakdown, use_container_width=True)
 
 def facilities_map_tab():
     """Facilities mapping"""
@@ -872,9 +996,12 @@ def audit_tab(params):
     st.latex(r"tpd_t = base\_tpd \times (1+g)^{(t-1)}")
     
     st.markdown("### Financial Calculations")
-    st.latex(r"revenue_t = kWh_{year,t} \times tariff")
+    st.latex(r"electricity\_revenue_t = kWh_{year,t} \times tariff")
+    st.latex(r"carbon\_revenue_t = \frac{kWh_{year,t} \times 0.9}{1000} \times carbon\_price")
+    st.latex(r"byproduct\_revenue_t = tons_{year,t} \times 0.3 \times byproduct\_price")
+    st.latex(r"total\_revenue_t = electricity\_revenue_t + carbon\_revenue_t + byproduct\_revenue_t")
     st.latex(r"opex_t = tons_{year,t} \times opex\_per\_ton + fixed\_opex")
-    st.latex(r"ncf_t = revenue_t - opex_t")
+    st.latex(r"ncf_t = total\_revenue_t - opex_t")
     
     st.markdown("### NPV Calculation")
     st.latex(r"NPV = -CAPEX + \sum_{t=1}^{horizon} \frac{ncf_t}{(1+r)^t}")
@@ -895,7 +1022,10 @@ def audit_tab(params):
             'Fixed OPEX (₹/year)',
             'CAPEX (₹)',
             'Discount Rate (%)',
-            'Project Horizon (years)'
+            'Project Horizon (years)',
+            'Carbon Credit Price (₹/credit)',
+            'Byproduct Sales Enabled',
+            'Byproduct Price (₹/ton)'
         ],
         'Value': [
             f"{params['yield_rate']:.1f}",
@@ -905,7 +1035,10 @@ def audit_tab(params):
             f"₹{params['fixed_opex']:,.0f}",
             f"₹{params['capex']:,.0f}",
             f"{params['discount_rate']*100:.1f}%",
-            f"{params['horizon_years']} years"
+            f"{params['horizon_years']} years",
+            f"₹{params['carbon_credit_price']:.0f}" if params['carbon_credit_price'] > 0 else "Not used",
+            "Yes" if params['enable_byproduct'] else "No",
+            f"₹{params['byproduct_price']:.0f}" if params['enable_byproduct'] else "N/A"
         ],
         'Unit': [
             'kWh/ton',
@@ -915,7 +1048,10 @@ def audit_tab(params):
             'INR per year',
             'INR',
             'Percentage',
-            'Years'
+            'Years',
+            'INR per credit',
+            'Boolean',
+            'INR per ton'
         ]
     }
     
