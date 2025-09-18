@@ -2,7 +2,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cairo", "cargo", "ffmpeg-full", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "libiconv", "libxcrypt", "libyaml", "pkg-config", "qhull", "rustc", "tcl", "tk"]
+packages = ["cairo", "cargo", "ffmpeg-full", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "libiconv", "libxcrypt", "libyaml", "openssl", "pkg-config", "postgresql", "qhull", "rustc", "tcl", "tk"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -35,3 +35,10 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 42189
+externalPort = 3000
+
+[agent]
+integrations = ["flask_supabase==1.0.0"]

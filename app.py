@@ -9,9 +9,30 @@ from streamlit_folium import st_folium
 import json
 from datetime import datetime, date
 import warnings
+import os
 
-# Import our modules
-from auth_inmemory import AuthStore, add_user, validate_user, add_waste_log, get_user_logs
+# Configuration flag for database backend
+USE_SUPABASE = os.environ.get('DATABASE_URL') is not None
+
+# Import our modules - conditional based on database backend
+if USE_SUPABASE:
+    try:
+        from supabase_store import add_user, validate_user, add_waste_log, get_user_logs, migrate
+        # Run migration on startup
+        if not migrate():
+            st.sidebar.warning("Database migration failed. Using in-memory storage.")
+            USE_SUPABASE = False
+    except Exception as e:
+        st.sidebar.warning(f"Database connection failed. Using in-memory storage.")
+        USE_SUPABASE = False
+
+if not USE_SUPABASE:
+    from auth_inmemory import AuthStore, add_user, validate_user, add_waste_log, get_user_logs
+else:
+    # Create a dummy AuthStore class for Supabase mode
+    class AuthStore:
+        def __init__(self):
+            pass
 from bia_core.data_io import load_curated_data
 from bia_core.schemas import UserProfile, WasteLog
 from bia_core.features import create_forecast_features
@@ -280,6 +301,10 @@ def sidebar_controls():
         st.sidebar.write(f"**{t('entity')}:** {st.session_state.user_profile.entity_name}")
         st.sidebar.write(f"**{t('city')}:** {st.session_state.user_profile.city}")
         st.sidebar.write(f"**{t('waste_type')}:** {st.session_state.user_profile.waste_type}")
+        
+        # Database backend indicator
+        db_status = "🗄️ Database" if USE_SUPABASE else "💾 In-Memory"
+        st.sidebar.write(f"**Storage:** {db_status}")
     
     st.sidebar.divider()
     

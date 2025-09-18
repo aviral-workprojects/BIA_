@@ -26,10 +26,12 @@ Preferred communication style: Simple, everyday language.
 - **Validation**: Pydantic schemas for data validation and type safety
 
 ### Data Storage Solutions
-- **Primary Storage**: In-memory storage using Streamlit's `@st.cache_resource` for thread-safe data persistence
-- **User Data**: Thread-safe authentication store managing user profiles and waste logs
+- **Primary Storage**: Optional Supabase/PostgreSQL database or in-memory storage using Streamlit's `@st.cache_resource`
+- **Database Backend**: Configurable persistence layer with automatic fallback to in-memory storage
+- **User Data**: Thread-safe authentication store managing user profiles and waste logs with bcrypt password hashing
 - **Curated Data**: CSV-based data storage for city statistics, facilities, tariffs, and cost parameters
 - **Session Management**: Browser session-based state management for user authentication and application state
+- **Migration System**: Automatic database table creation and schema management on startup
 
 ### Authentication and Authorization
 - **Password Security**: bcrypt hashing algorithm for secure password storage
@@ -42,6 +44,13 @@ Preferred communication style: Simple, everyday language.
 - **Factory Pattern**: Model selector for choosing optimal forecasting approach based on data characteristics
 - **Separation of Concerns**: Clear separation between data models, business logic, and presentation layers
 - **Error Handling**: Comprehensive error handling with graceful fallbacks for missing dependencies
+
+### Database Integration
+- **Supabase Support**: Optional PostgreSQL database persistence via DATABASE_URL environment variable
+- **Conditional Storage**: USE_SUPABASE flag automatically detects DATABASE_URL presence and enables database backend
+- **SQLAlchemy ORM**: Database operations using SQLAlchemy with psycopg2 for PostgreSQL connectivity
+- **Migration Support**: Automatic table creation for users and waste_logs with proper indexing and foreign keys
+- **Graceful Fallback**: Automatic fallback to in-memory storage if database connection fails
 
 ## External Dependencies
 
