@@ -12,7 +12,7 @@ import warnings
 import os
 
 # Configuration flag for database backend
-USE_SUPABASE = os.environ.get('DATABASE_URL') is not None
+USE_SUPABASE = st.secrets.get("DATABASE_URL") is not None if hasattr(st, 'secrets') else os.getenv("DATABASE_URL") is not None
 
 # Import our modules - conditional based on database backend
 if USE_SUPABASE:
