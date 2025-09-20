@@ -90,28 +90,32 @@ class FinanceCalculator:
         }
     
     def calculate_cashflows(self, daily_waste_tons: float, horizon_years: int,
-                          growth_rate: float = 0.02) -> List[Dict[str, float]]:
+                        growth_rate: float = 0.02) -> List[Dict[str, float]]:
         """Calculate cashflows for project horizon"""
-        
+
         cashflows = []
-        
+
         for year in range(1, horizon_years + 1):
             annual_metrics = self.calculate_annual_metrics(
-                daily_waste_tons, year, growth_rate
+            daily_waste_tons, year, growth_rate
             )
-            
+
             cashflow_item = {
-                'year': year,
-                'waste_tons': annual_metrics['waste_tons'],
-                'electricity_kwh': annual_metrics['electricity_kwh'],
-                'revenue': annual_metrics['revenue'],
-                'opex': annual_metrics['total_opex'],
-                'ncf': annual_metrics['ncf']
+            'year': year,
+            'waste_tons': annual_metrics['waste_tons'],
+            'electricity_kwh': annual_metrics['electricity_kwh'],
+            'electricity_revenue': annual_metrics['electricity_revenue'],
+            'carbon_revenue': annual_metrics['carbon_revenue'],
+            'byproduct_revenue': annual_metrics['byproduct_revenue'],
+            'total_revenue': annual_metrics['revenue'],
+            'opex': annual_metrics['total_opex'],
+            'ncf': annual_metrics['ncf']
             }
-            
+
             cashflows.append(cashflow_item)
-        
+
         return cashflows
+
     
     def calculate_npv(self, daily_waste_tons: float, horizon_years: int,
                       growth_rate: float = 0.02) -> float:
